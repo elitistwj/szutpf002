@@ -1,0 +1,4 @@
+普法答题系统/
+├── index.html      （主页面）
+├── style.css       （样式）
+└── data.js         （题目数据）

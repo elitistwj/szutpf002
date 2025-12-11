@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>普法知识竞赛</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <!-- 微信分享支持 -->
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+</head>
+<body>
+    <!-- 首页 -->
+    <div id="homePage" class="page active">
+        <div class="header">
+            <img src="https://via.placeholder.com/80x80/4a6bff/ffffff?text=普法" class="logo" alt="普法logo">
+            <h1>普法知识竞赛</h1>
+            <p class="subtitle">学法律知识 · 做守法公民</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <i class="bi bi-people"></i>
+                <span>已有 <strong id="totalPlayers">1258</strong> 人参与</span>
+            </div>
+            <div class="stat-item">
+                <i class="bi bi-trophy"></i>
+                <span>最高分 <strong id="highestScore">98</strong> 分</span>
+            </div>
+        </div>
+        
+        <div class="start-section">
+            <button class="start-btn" onclick="startQuiz()">
+                <i class="bi bi-play-circle"></i> 开始答题
+            </button>
+            <button class="rank-btn" onclick="showRanking()">
+                <i class="bi bi-bar-chart"></i> 查看排名
+            </button>
+            <button class="rule-btn" onclick="showRules()">
+                <i class="bi bi-info-circle"></i> 活动规则
+            </button>
+        </div>
+        
+        <div class="category-list">
+            <div class="category" onclick="selectCategory('civil')">
+                <i class="bi bi-house-heart"></i>
+                <span>民法典</span>
+            </div>
+            <div class="category" onclick="selectCategory('criminal')">
+                <i class="bi bi-shield-check"></i>
+                <span>刑法</span>
+            </div>
+            <div class="category" onclick="selectCategory('traffic')">
+                <i class="bi bi-car-front"></i>
+                <span>交通安全</span>
+            </div>
+            <div class="category" onclick="selectCategory('consumer')">
+                <i class="bi bi-cart-check"></i>
+                <span>消费者权益</span>
+            </div>
+        </div>
+        
+        <div class="share-section">
+            <p>分享给朋友一起参与</p>
+            <button class="share-btn" onclick="shareToWechat()">
+                <i class="bi bi-wechat"></i> 分享到微信
+            </button>
+        </div>
+    </div>
+    
+    <!-- 答题页面 -->
+    <div id="quizPage" class="page">
+        <div class="quiz-header">
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+            <div class="quiz-info">
+                <span id="currentQuestion">1/10</span>
+                <span class="score">得分: <span id="currentScore">0</span></span>
+            </div>
+        </div>
+        
+        <div class="question-container">
+            <h2 id="questionText">题目内容</h2>
+            <div id="questionImage"></div>
+        </div>
+        
+        <div class="options-container" id="optionsContainer">
+            <!-- 选项动态生成 -->
+        </div>
+        
+        <div class="quiz-footer">
+            <button class="submit-btn" id="submitBtn" onclick="submitAnswer()" disabled>
+                提交答案
+            </button>
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()" style="display:none;">
+                下一题
+            </button>
+        </div>
+    </div>
+    
+    <!-- 结果页面 -->
+    <div id="resultPage" class="page">
+        <div class="result-header">
+            <i class="bi bi-award trophy"></i>
+            <h2>答题完成！</h2>
+        </div>
+        
+        <div class="score-card">
+            <div class="score-circle">
+                <span id="finalScore">0</span>
+                <small>分</small>
+            </div>
+            <p class="score-rank">排名第 <span id="rank">-</span> 名</p>
+        </div>
+        
+        <div class="result-details">
+            <div class="detail-item">
+                <i class="bi bi-check-circle"></i>
+                <span>答对: <strong id="correctCount">0</strong> 题</span>
+            </div>
+            <div class="detail-item">
+                <i class="bi bi-clock"></i>
+                <span>用时: <strong id="timeUsed">0</strong> 秒</span>
+            </div>
+            <div class="detail-item">
+                <i class="bi bi-percent"></i>
+                <span>正确率: <strong id="accuracy">0%</strong></span>
+            </div>
+        </div>
+        
+        <div class="result-actions">
+            <button class="view-rank-btn" onclick="showRanking()">
+                <i class="bi bi-trophy"></i> 查看完整排名
+            </button>
+            <button class="restart-btn" onclick="restartQuiz()">
+                <i class="bi bi-arrow-repeat"></i> 重新答题
+            </button>
+            <button class="share-result-btn" onclick="shareResult()">
+                <i class="bi bi-share"></i> 分享成绩
+            </button>
+        </div>
+        
+        <div class="answer-review">
+            <h3><i class="bi bi-journal-text"></i> 题目解析</h3>
+            <div id="reviewContent"></div>
+        </div>
+    </div>
+    
+    <!-- 排名页面 -->
+    <div id="rankPage" class="page">
+        <div class="rank-header">
+            <h2><i class="bi bi-trophy"></i> 排行榜</h2>
+            <button class="back-btn" onclick="goHome()">
+                <i class="bi bi-arrow-left"></i> 返回
+            </button>
+        </div>
+        
+        <div class="rank-tabs">
+            <button class="rank-tab active" onclick="changeRankTab('today')">今日排名</button>
+            <button class="rank-tab" onclick="changeRankTab('total')">总排名</button>
+            <button class="rank-tab" onclick="changeRankTab('friends')">好友排名</button>
+        </div>
+        
+        <div class="rank-list" id="rankList">
+            <!-- 排名动态生成 -->
+        </div>
+        
+        <div class="my-rank">
+            <div class="my-rank-header">
+                <i class="bi bi-person-circle"></i>
+                <span>我的排名</span>
+            </div>
+            <div class="my-rank-detail">
+                <span class="rank-number">第 <span id="myRank">-</span> 名</span>
+                <span class="rank-score"><span id="myScore">0</span> 分</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 规则页面 -->
+    <div id="rulePage" class="page">
+        <div class="rule-header">
+            <h2><i class="bi bi-info-circle"></i> 活动规则</h2>
+            <button class="back-btn" onclick="goHome()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="rule-content">
+            <div class="rule-item">
+                <h3><i class="bi bi-1-circle"></i> 答题规则</h3>
+                <p>• 共10道题目，每题10分</p>
+                <p>• 单选题，选择一个正确答案</p>
+                <p>• 每题答题时间不限</p>
+            </div>
+            
+            <div class="rule-item">
+                <h3><i class="bi bi-2-circle"></i> 评分规则</h3>
+                <p>• 答对得10分，答错不得分</p>
+                <p>• 总分100分，按得分排名</p>
+                <p>• 同分者按答题时间排序</p>
+            </div>
+            
+            <div class="rule-item">
+                <h3><i class="bi bi-3-circle"></i> 排名规则</h3>
+                <p>• 每日更新排行榜</p>
+                <p>• 每周公布获奖名单</p>
+                <p>• 排名前10名有奖励</p>
+            </div>
+            
+            <div class="rule-item">
+                <h3><i class="bi bi-4-circle"></i> 注意事项</h3>
+                <p>• 每人每天可答题3次</p>
+                <p>• 禁止作弊，违规取消资格</p>
+                <p>• 活动最终解释权归主办方</p>
+            </div>
+        </div>
+        
+        <button class="start-btn" onclick="goHome()">
+            开始答题
+        </button>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
